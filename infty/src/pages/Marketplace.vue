@@ -1,6 +1,6 @@
 <template>
   <div class="marketplace">
-    <Navbar active-index="0"/>
+    <Navbar active-index="0" />
     <div>
       <div id="sidebar" style="width: 25%">
         <b-card no-body style="max-width: 20rem">
@@ -183,6 +183,13 @@ export default {
       usersCards: [
         {
           id: 1,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "SupDucks",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -193,6 +200,13 @@ export default {
         },
         {
           id: 2,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Art Blocks Curated",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -203,6 +217,13 @@ export default {
         },
         {
           id: 3,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Bored Ape Kennel Club",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -213,6 +234,13 @@ export default {
         },
         {
           id: 4,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Cool Cats",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -223,6 +251,13 @@ export default {
         },
         {
           id: 5,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "ZED RUN",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -233,6 +268,13 @@ export default {
         },
         {
           id: 6,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "FameLadySquad",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -243,6 +285,13 @@ export default {
         },
         {
           id: 7,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Sorare",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -253,6 +302,13 @@ export default {
         },
         {
           id: 8,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Meebits",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),
@@ -263,6 +319,13 @@ export default {
         },
         {
           id: 9,
+          title: "my NFT",
+          description: "good",
+          file: "binary string",
+          currency: "cfx",
+          percentage: 0.65,
+          album_id: "xxx",
+          owner: "cfx:dsfawe",
           collection: "Ape Gang",
           author: "Ada Lovelace",
           price: Math.random().toFixed(2),

@@ -59,8 +59,9 @@
               <b-icon icon="card-image"></b-icon>&nbsp;Card Name
             </span>
             <span class="mb-0 heart"
-              ><button><b-icon icon="heart"></b-icon></button>&nbsp;2</span
-            >
+              ><button class="heart">
+                <div class="heart-flip"></div></button
+            ></span>
           </template>
           <b-card-text>Owned by {{ card.author }}</b-card-text>
           <!-- <template #footer>
@@ -152,4 +153,11 @@ export default {
 /* .transaction-info {
   margin-bottom: 20px;
 } */
+.heart,
+.heart-button {
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
 </style>
