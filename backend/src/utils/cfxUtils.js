@@ -64,8 +64,14 @@ async function generateUri(req, imageUri, sha) {
 
 // TODO
 function actualTokenId(addr, uri, guess) {
-    return makeid(5)
+    const totalTokens = minterContract.balanceOf(addr);
+    if (totalTokens == 0) {
+        console.log("Error! NFT haven't been minted to this addr");
+    }
+    return minterContract.tokenOfOwnerByIndex(addr, totalTokens - 1);
 }
+
+
 module.exports = {
     nextTokenId,
     mint,
