@@ -36,14 +36,18 @@
                     v-model="text"
                     placeholder="Min"
                     class="price-range"
+                    type="number"
+                    @update="changeMin"
                   ></b-form-input>
                   <span>to</span>
                   <b-form-input
                     v-model="text"
                     placeholder="Max"
                     class="price-range"
+                    type="number"
+                    @update="changeMax"
                   ></b-form-input>
-                  <b-button id="price-apply-btn" variant="outline-primary"
+                  <b-button id="price-apply-btn" variant="outline-primary" @click="pricefilter"
                     >Apply</b-button
                   >
                 </b-card>
@@ -127,7 +131,7 @@
                   </div>
                 </transition>
                 <el-empty class='flex-wrapper-row' v-if='usersCards.length==0' description="Nothing"/>
-                <NftCard v-for="card in usersCards" :card="card" :key="card.url" class='mr-5 mb-4'/>
+                <NftCard v-for="card in usersCards" :card="card" :key="card.url" class='mr-5 mb-4' v-show="card.showstatus"/>
               </div>
               <p v-if="noMoreNft && usersCards.length!=0"
               style='border-bottom: 1px solid grey; line-height: 0.1rem;text-align:center'>
@@ -144,7 +148,7 @@
                   </div>
                 </transition>
                 <el-empty  class='flex-wrapper-row' v-if='usersAlbum.length==0' description="Nothing"/>
-                <AlbumCard  class='mr-4 mb-4 alb-card' v-for="album in usersAlbum" :card="album" :key="album.url" />
+                <AlbumCard  class='mr-4 mb-4 alb-card' v-for="album in usersAlbum" :card="album" :key="album.url" v-show="album.showstatus"/>
               </div>
               <p v-if="noMoreAlbum && usersAlbum.length != 0"
               style='border-bottom: 1px solid grey; line-height: 0.1rem;text-align:center'>
@@ -223,6 +227,8 @@ export default {
       user: undefined,
       notMine: false,
       loadingVar: 0,
+      min: 0,
+      max: 0,
     };
   },
 
@@ -238,6 +244,14 @@ export default {
             this.loadAlbumMarket();
           }
         }
+      },
+
+      changeMin(value){
+        this.min = value;
+      },
+
+      changeMax(value){
+        this.max = value;
       },
 
       async proccessNft(nft_ids) {
@@ -257,9 +271,11 @@ export default {
               n.data.authorName = res.data.first_name + " " + res.data.last_name
               n.data.url = n.data.file;
               if (n.data.fragmented && this.fragments.some(f => f.nft_id == n.data.nft_id && f.status == 'sale')) {
-                n.data.status = 'sale'
+                n.data.status = 'sale';
+                n.data.showstatus = true;
                 this.usersCards.push(n.data);
               } else {
+                n.data.showstatus = true;
                 this.usersCards.push(n.data);
               }
             })
@@ -278,6 +294,7 @@ export default {
             axios.get(`${this.$store.getters.getApiUrl}/profile/${a.data.author}`).then((res) => {
               a.data.author = res.data.first_name + " " + res.data.last_name
               a.data.url = a.data.file;
+              a.data.showstatus = true;
               this.usersAlbum.push(a.data);
             })
           }
@@ -318,6 +335,25 @@ export default {
             this.loadingAlbum = false;
         });
       }, 200)
+    },
+    pricefilter(){
+      if(this.tabIndex == 0){
+          this.priceupdate(this.usersCards);
+      }
+      else{
+        this.priceupdate(this.usersAlbum);
+      }
+    },
+
+    priceupdate(lst){
+      lst.map((item)=>{
+          if(item.price > this.max || item.price < this.min){
+            item.showstatus = false;
+          }
+          else{
+            item.showstatus = true;
+          }
+        })
     },
     
     filterOthers(checked) {
