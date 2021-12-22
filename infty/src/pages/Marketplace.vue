@@ -113,9 +113,9 @@
         <div id="search-bar">
           <b-input-group size="md" class="mb-2">
             
-            <b-form-input type="search" placeholder="Search..."  @keyup.enter='$store.dispatch("notifyWIP")'></b-form-input>
+            <b-form-input type="search" placeholder="Search..."  @update='search'></b-form-input>
             <b-input-group-prepend is-text>
-              <b-icon icon="search" style='cursor:pointer' @click='$store.dispatch("notifyWIP")'></b-icon>
+              <b-icon icon="search" style='cursor:pointer' @click='search'></b-icon>
             </b-input-group-prepend>
           </b-input-group>
 
@@ -354,6 +354,28 @@ export default {
             item.showstatus = true;
           }
         })
+    },
+
+    search(value){
+      if(this.tabIndex == 0){
+        this.searchresult(this.usersCards, value);
+      }
+      else{
+        this.searchresult(this.usersAlbum, value);
+      }
+    },
+
+    searchresult(lst, value){
+      lst.map((item)=>{
+        if(item.title.indexOf(value) != -1){
+          console.log("if")
+          item.showstatus = true;
+        }
+        else{
+          console.log("else")
+          item.showstatus = false;
+        }
+      })
     },
     
     filterOthers(checked) {
