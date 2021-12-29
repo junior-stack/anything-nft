@@ -111,9 +111,9 @@
         <div id="search-bar">
           <b-input-group size="md" class="mb-2">
             
-            <b-form-input type="search" placeholder="Search..."  @update='search'></b-form-input>
+            <b-form-input type="search" placeholder="Search..."  v-model="condition" @key.enter='applysearchfilter'></b-form-input>
             <b-input-group-prepend is-text>
-              <b-icon icon="search" style='cursor:pointer' @click='search'></b-icon>
+              <b-icon icon="search" style='cursor:pointer' @click='applysearchfilter'></b-icon>
             </b-input-group-prepend>
           </b-input-group>
 
@@ -221,7 +221,7 @@ export default {
       priceTypeSelected: "usd",
       priceTypeOptions: [
         { value: "usd", text: "United States Dollar(USD)" },
-        { value: "eth", text: "Ether(ETH)" },
+        { value: "cfx", text: "Ether(ETH)" },
       ],
       usersCards: [],
       loadingNft: false,
@@ -374,6 +374,14 @@ export default {
     applypricefilter(){
       this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
       this.usersCards = [];
+      if(this.tabIndex == 0){
+        this.offsetNft = 0;
+        this.usersCards = [];
+      }
+      else{
+        this.offsetAlbum = 0;
+        this.usersAlbum = [];
+      }
       this.pricefilter();
     },
 
