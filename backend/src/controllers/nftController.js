@@ -27,7 +27,7 @@ const getMarket = async (req, res) => {
       filter = {status: constants.STATUS_SALE, currency: body.priceTypeSelected, price: {$gte: body.min, $lte: body.max}}
   }
   else if(mode == 2){
-      filter = {status: constants.STATUS_SALE, title: /body.text/}
+      filter = {status: constants.STATUS_SALE, title: {$regex: eval(`/${body.text}/`)}}
   }
 
   const nftQuery = Nft.find(filter, { nft_id: 1 })
