@@ -29,25 +29,32 @@ const getMarket = async (req, res) => {
   else if(mode == 2){
       filter = {status: constants.STATUS_SALE, title: {$regex: eval(`/${body.text}/`)}}
   }
-
-  const nftQuery = Nft.find(filter, { nft_id: 1 })
-  .sort({ nft_id: "desc" })
-  .skip(offset)
-  .limit(limit)
-    
-  const albumQuery = Album.find(
-    filter,
-    { album_id: 1 }
-  )
-    .sort({ album_id: "desc" })
-    .skip(offset)
-    .limit(limit);
-
-  const result = {
-    nft_ids: (await nftQuery.exec()).map((n) => n.nft_id),
-    album_ids: (await albumQuery.exec()).map((n) => n.album_id)
+  console.log("filter",filter);
+  if(body.tabIndex == 0){
+    const nftQuery = Nft.find(
+        filter,
+        { nft_id: 1 }
+        )
+        .sort({ nft_id: "desc" })
+        .skip(offset)
+        .limit(limit);
+      const result = {ids: (await nftQuery.exec()).map((n) => n.nft_id)};
+      console.log(result);
+      res.send(result);
   }
-  res.send(result);
+  else{
+    const albumQuery = Album.find(
+        filter,
+        { album_id: 1 }
+        )
+        .sort({ album_id: "desc" })
+        .skip(offset)
+        .limit(limit);
+    const result = {ids: (await albumQuery.exec()).map((n) => n.album_id)};
+    console.log(result);
+    res.send(result);
+  }
+        
 };
 
 const getNft = async (req, res) => {
