@@ -186,8 +186,16 @@ export default {
 
   beforeMount() {
     this.user = this.$store.getters.getAddress;
-    this.loadNftMarket();
-    this.loadAlbumMarket();
+    this.loadNftMarket({
+          offset: this.offsetAlbum,
+          limit: this.limit,
+          mode: this.filtermode
+        });
+    this.loadAlbumMarket({
+          offset: this.offsetAlbum,
+          limit: this.limit,
+          mode: this.filtermode
+        });
   },
 
   mounted() {
@@ -295,36 +303,30 @@ export default {
         })
       },
 
-      loadNftMarket(){
+      loadNftMarket(body){
         this.loadingNft = true;
+        body.tabIndex = 0;
         setTimeout(() => {
-          const body = {
-            offset: this.offsetNft,
-            limit: this.limit,
-          };
           axios.post(this.$store.getters.getApiUrl+"/market", body)
           .then((res) => {
-              const nft_ids = res.data.nft_ids;
+              const nft_ids = res.data.ids;
               this.proccessNft(nft_ids);
-              this.offsetNft += nft_ids.length;
+              this.offsetNft += nft_ids.length;   // used as a limit to call API in filterOthers
               this.noMoreNft = nft_ids.length < this.limit;
               this.loadingNft = false;
           });
         }, 200)
     },
 
-    loadAlbumMarket(){
+    loadAlbumMarket(body){
       this.loadingAlbum = true;
+      body.tabIndex = 1
       setTimeout(() => {
-        const body = {
-          offset: this.offsetAlbum,
-          limit: this.limit,
-        };
         axios.post(this.$store.getters.getApiUrl+"/market", body)
         .then((res) => {
-            const album_ids = res.data.album_ids;
-            this.proccessAlbum(album_ids);
-            this.offsetAlbum += album_ids.length;
+            const album_ids = res.data.ids; //2 album_ids
+            this.proccessAlbum(album_ids);       
+            this.offsetAlbum += album_ids.length;  
             this.noMoreAlbum = album_ids.length < this.limit;
             this.loadingAlbum = false;
         });
@@ -348,6 +350,13 @@ export default {
       }
     },
 
+    noFilter(){
+      let option = {
+        offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
+        limit: this.limit,
+        mode: 0
+      }
+      this.generalfilter(option);
     },
 
     pricefilter(){
