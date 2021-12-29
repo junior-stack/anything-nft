@@ -33,21 +33,19 @@
                     :options="priceTypeOptions"
                   ></b-form-select>
                   <b-form-input
-                    v-model="text"
+                    v-model="min"
                     placeholder="Min"
                     class="price-range"
                     type="number"
-                    @update="changeMin"
                   ></b-form-input>
                   <span>to</span>
                   <b-form-input
-                    v-model="text"
+                    v-model="max"
                     placeholder="Max"
                     class="price-range"
                     type="number"
-                    @update="changeMax"
                   ></b-form-input>
-                  <b-button id="price-apply-btn" variant="outline-primary" @click="pricefilter"
+                  <b-button id="price-apply-btn" variant="outline-primary" @click="applypricefilter"
                     >Apply</b-button
                   >
                 </b-card>
@@ -372,6 +370,27 @@ export default {
          this.loadingAlbum = false;
         }
       })
+
+    },
+
+    pricefilter(){
+      let option = {
+        offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
+        limit: this.limit,
+        mode: 1,
+        max: Number(this.max),
+        min: Number(this.min),
+        priceTypeSelected: this.priceTypeSelected,
+      };
+      this.generalfilter(option)
+    },
+
+    applypricefilter(){
+      this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
+      this.usersCards = [];
+      this.pricefilter();
+    },
+
     },
     
     filterOthers(checked) {
