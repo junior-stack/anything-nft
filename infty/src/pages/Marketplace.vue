@@ -131,7 +131,7 @@
                   </div>
                 </transition>
                 <el-empty class='flex-wrapper-row' v-if='usersCards.length==0' description="Nothing"/>
-                <NftCard v-for="card in usersCards" :card="card" :key="card.url" class='mr-5 mb-4' v-show="card.showstatus"/>
+                <NftCard v-for="card in usersCards" :card="card" :key="card.url" class='mr-5 mb-4'/>
               </div>
               <p v-if="noMoreNft && usersCards.length!=0"
               style='border-bottom: 1px solid grey; line-height: 0.1rem;text-align:center'>
@@ -148,7 +148,7 @@
                   </div>
                 </transition>
                 <el-empty  class='flex-wrapper-row' v-if='usersAlbum.length==0' description="Nothing"/>
-                <AlbumCard  class='mr-4 mb-4 alb-card' v-for="album in usersAlbum" :card="album" :key="album.url" v-show="album.showstatus"/>
+                <AlbumCard  class='mr-4 mb-4 alb-card' v-for="album in usersAlbum" :card="album" :key="album.url"/>
               </div>
               <p v-if="noMoreAlbum && usersAlbum.length != 0"
               style='border-bottom: 1px solid grey; line-height: 0.1rem;text-align:center'>
@@ -229,6 +229,8 @@ export default {
       loadingVar: 0,
       min: 0,
       max: 0,
+      text: "",
+      filtermode: 0,
     };
   },
 
@@ -237,22 +239,19 @@ export default {
         let bottomOfWindow = Math.abs(
           (document.documentElement.scrollTop + window.innerHeight) - document.documentElement.offsetHeight
         ) < 400;
+        let operations = [];
+        operations.push(this.loadNftMarket.bind(this));
+        operations.push(this.pricefilter.bind(this));
+        operations.push(this.searchfilter.bind(this));
         if(bottomOfWindow && !this.noMoreNft) {
           if (this.tabIndex == 0){
-            this.loadNftMarket();
+            operations[this.filtermode]();
           } else {
-            this.loadAlbumMarket();
+            operations[this.filtermode]();
           }
         }
       },
 
-      changeMin(value){
-        this.min = value;
-      },
-
-      changeMax(value){
-        this.max = value;
-      },
 
       async proccessNft(nft_ids) {
         nft_ids = [ ... new Set(nft_ids)]
@@ -272,10 +271,8 @@ export default {
               n.data.url = n.data.file;
               if (n.data.fragmented && this.fragments.some(f => f.nft_id == n.data.nft_id && f.status == 'sale')) {
                 n.data.status = 'sale';
-                n.data.showstatus = true;
                 this.usersCards.push(n.data);
               } else {
-                n.data.showstatus = true;
                 this.usersCards.push(n.data);
               }
             })
@@ -294,7 +291,6 @@ export default {
             axios.get(`${this.$store.getters.getApiUrl}/profile/${a.data.author}`).then((res) => {
               a.data.author = res.data.first_name + " " + res.data.last_name
               a.data.url = a.data.file;
-              a.data.showstatus = true;
               this.usersAlbum.push(a.data);
             })
           }
@@ -336,44 +332,44 @@ export default {
         });
       }, 200)
     },
-    pricefilter(){
-      if(this.tabIndex == 0){
-          this.priceupdate(this.usersCards);
-      }
-      else{
-        this.priceupdate(this.usersAlbum);
-      }
+
+    async filterhelper(ids, url){
+      const promises = ids.map((id) => axios.get(url + `${id}`));
+      const promises_result = await Promise.allSettled(promises);
+      let items = promises_result.map((p) => {
+        if (p.status == "fulfilled") return p.value;
+      });
+      items.map((item)=>{
+        if((this.notMine && this.user != item.data.owner[0].address) || !this.notMine)
+            axios.get(`${this.$store.getters.getApiUrl}/profile/${item.data.author}`).then((res) => {
+              item.data.author = res.data.first_name + " " + res.data.last_name
+              item.data.url = item.data.file;
+              this.usersCards.push(item.data);
+            })
+      })
     },
 
-    priceupdate(lst){
-      lst.map((item)=>{
-          if(item.price > this.max || item.price < this.min){
-            item.showstatus = false;
-          }
-          else{
-            item.showstatus = true;
-          }
-        })
-    },
-
-    search(value){
-      if(this.tabIndex == 0){
-        this.searchresult(this.usersCards, value);
+    generalfilter(body){
+      if(this.filtermode != body.mode){
+        this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
+        this.tabIndex == 0 ? body.offset = this.offsetNft : body.offset = this.offsetAlbum;
+        this.filtermode = body.mode;
+        this.usersCards = [];
       }
-      else{
-        this.searchresult(this.usersAlbum, value);
-      }
-    },
-
-    searchresult(lst, value){
-      lst.map((item)=>{
-        if(item.title.indexOf(value) != -1){
-          console.log("if")
-          item.showstatus = true;
+      axios.post(this.$store.getters.getApiUrl+"/market", body)
+      .then((res) =>{
+        const ids = this.tabIndex == 0 ? res.data.nft_ids : res.data.album_ids;
+        if(this.tabIndex == 0){
+          this.filterhelper(ids, `${this.$store.getters.getApiUrl}/nft/`);
+          this.offsetNft += ids.length;
+          this.noMoreNft = ids.length < this.limit;
+          this.loadingNft = false;
         }
         else{
-          console.log("else")
-          item.showstatus = false;
+         this.filterhelper(ids, `${this.$store.getters.getApiUrl}/album/`);
+         this.offsetAlbum += ids.length;
+         this.noMoreAlbum = ids.length < this.limit;
+         this.loadingAlbum = false;
         }
       })
     },
