@@ -238,7 +238,7 @@ export default {
           (document.documentElement.scrollTop + window.innerHeight) - document.documentElement.offsetHeight
         ) < 400;
         let operations = [];
-        operations.push(this.loadNftMarket.bind(this));
+        operations.push(this.noFilter.bind(this));
         operations.push(this.pricefilter.bind(this));
         operations.push(this.searchfilter.bind(this));
         if(bottomOfWindow && !this.noMoreNft) {
@@ -331,21 +331,6 @@ export default {
       }, 200)
     },
 
-    async filterhelper(ids, url){
-      const promises = ids.map((id) => axios.get(url + `${id}`));
-      const promises_result = await Promise.allSettled(promises);
-      let items = promises_result.map((p) => {
-        if (p.status == "fulfilled") return p.value;
-      });
-      items.map((item)=>{
-        if((this.notMine && this.user != item.data.owner[0].address) || !this.notMine)
-            axios.get(`${this.$store.getters.getApiUrl}/profile/${item.data.author}`).then((res) => {
-              item.data.author = res.data.first_name + " " + res.data.last_name
-              item.data.url = item.data.file;
-              this.usersCards.push(item.data);
-            })
-      })
-    },
 
     generalfilter(body){
       if(this.filtermode != body.mode){
@@ -353,23 +338,15 @@ export default {
         this.tabIndex == 0 ? body.offset = this.offsetNft : body.offset = this.offsetAlbum;
         this.filtermode = body.mode;
         this.usersCards = [];
+        this.usersAlbum = []
       }
-      axios.post(this.$store.getters.getApiUrl+"/market", body)
-      .then((res) =>{
-        const ids = this.tabIndex == 0 ? res.data.nft_ids : res.data.album_ids;
-        if(this.tabIndex == 0){
-          this.filterhelper(ids, `${this.$store.getters.getApiUrl}/nft/`);
-          this.offsetNft += ids.length;
-          this.noMoreNft = ids.length < this.limit;
-          this.loadingNft = false;
-        }
-        else{
-         this.filterhelper(ids, `${this.$store.getters.getApiUrl}/album/`);
-         this.offsetAlbum += ids.length;
-         this.noMoreAlbum = ids.length < this.limit;
-         this.loadingAlbum = false;
-        }
-      })
+      if(this.tabIndex == 0){
+        this.loadNftMarket(body);
+      }
+      else{
+        this.loadAlbumMarket(body);
+      }
+    },
 
     },
 
