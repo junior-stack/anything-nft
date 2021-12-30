@@ -383,6 +383,22 @@ export default {
       this.pricefilter();
     },
 
+
+    searchfilter(){
+      if(this.text){
+        this.generalfilter({
+        offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
+        limit: this.limit,
+        mode: 2,
+        text: this.text
+      })
+      }
+    },
+
+    applysearchfilter(){
+      this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
+      this.text = this.condition;
+      this.searchfilter();
     },
     
     filterOthers(checked) {
