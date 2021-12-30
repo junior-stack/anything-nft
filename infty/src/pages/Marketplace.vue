@@ -372,8 +372,6 @@ export default {
     },
 
     applypricefilter(){
-      this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
-      this.usersCards = [];
       if(this.tabIndex == 0){
         this.offsetNft = 0;
         this.usersCards = [];
