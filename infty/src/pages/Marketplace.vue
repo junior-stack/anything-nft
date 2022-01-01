@@ -45,7 +45,7 @@
                     class="price-range"
                     type="number"
                   ></b-form-input>
-                  <b-button id="price-apply-btn" variant="outline-primary" @click="applypricefilter"
+                  <b-button id="price-apply-btn" variant="outline-primary" @click="pricefilter('button')"
                     >Apply</b-button
                   >
                 </b-card>
@@ -111,9 +111,9 @@
         <div id="search-bar">
           <b-input-group size="md" class="mb-2">
             
-            <b-form-input type="search" placeholder="Search..."  v-model="condition" @key.enter='applysearchfilter'></b-form-input>
+            <b-form-input type="search" placeholder="Search..."  v-model="text" @key.enter='searchfilter("button")'></b-form-input>
             <b-input-group-prepend is-text>
-              <b-icon icon="search" style='cursor:pointer' @click='applysearchfilter'></b-icon>
+              <b-icon icon="search" style='cursor:pointer' @click='searchfilter("button")'></b-icon>
             </b-input-group-prepend>
           </b-input-group>
 
@@ -249,12 +249,10 @@ export default {
         operations.push(this.noFilter.bind(this));
         operations.push(this.pricefilter.bind(this));
         operations.push(this.searchfilter.bind(this));
+        let triggermethod = "getmore"
         if(bottomOfWindow && !this.noMoreNft) {
-          if (this.tabIndex == 0){
-            operations[this.filtermode]();
-          } else {
-            operations[this.filtermode]();
-          }
+          operations[this.filtermode](triggermethod)
+          ;
         }
       },
 
@@ -305,8 +303,8 @@ export default {
 
       loadNftMarket(body){
         this.loadingNft = true;
-        body.tabIndex = 0;
         setTimeout(() => {
+          body.tabIndex = 0;
           axios.post(this.$store.getters.getApiUrl+"/market", body)
           .then((res) => {
               const nft_ids = res.data.ids;
@@ -320,8 +318,8 @@ export default {
 
     loadAlbumMarket(body){
       this.loadingAlbum = true;
-      body.tabIndex = 1
       setTimeout(() => {
+        body.tabIndex = 1;
         axios.post(this.$store.getters.getApiUrl+"/market", body)
         .then((res) => {
             const album_ids = res.data.ids; //2 album_ids
@@ -334,15 +332,8 @@ export default {
     },
 
 
-    generalfilter(body){
-      if(this.filtermode != body.mode){
-        this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
-        this.tabIndex == 0 ? body.offset = this.offsetNft : body.offset = this.offsetAlbum;
-        this.filtermode = body.mode;
-        this.usersCards = [];
-        this.usersAlbum = []
-      }
-      if(this.tabIndex == 0){
+    generalfilter(body, tabIndex){
+      if(tabIndex == 0){
         this.loadNftMarket(body);
       }
       else{
@@ -359,47 +350,80 @@ export default {
       this.generalfilter(option);
     },
 
-    pricefilter(){
-      let option = {
+
+    pricefilter(triggermethod){
+      if(triggermethod == "button"){
+        this.offsetNft = 0;
+        this.offsetAlbum = 0;
+        this.usersCards = [];
+        this.usersAlbum = [];
+        this.filtermode = 1;
+        this.generalfilter({
+        offset: this.offsetNft,
+        limit: this.limit,
+        mode: 1,
+        max: Number(this.max),
+        min: Number(this.min),
+        priceTypeSelected: this.priceTypeSelected,
+      }, 0);
+        this.generalfilter({
+        offset: this.offsetAlbum,
+        limit: this.limit,
+        mode: 1,
+        max: Number(this.max),
+        min: Number(this.min),
+        priceTypeSelected: this.priceTypeSelected,
+      }, 1);
+      }
+      else{
+        this.generalfilter({
         offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
         limit: this.limit,
         mode: 1,
         max: Number(this.max),
         min: Number(this.min),
         priceTypeSelected: this.priceTypeSelected,
-      };
-      this.generalfilter(option)
+      }, this.tabIndex);
+      }
     },
 
-    applypricefilter(){
-      if(this.tabIndex == 0){
-        this.offsetNft = 0;
-        this.usersCards = [];
+
+    searchfilter(triggermethod){
+      if(triggermethod == "button"){
+        if(this.text){
+          this.offsetNft = 0;
+          this.offsetAlbum = 0;
+          this.usersCards = [];
+          this.usersAlbum = [];
+          this.filtermode = 2;
+          this.generalfilter({
+          offset: this.offsetNft,
+          limit: this.limit,
+          mode: 2,
+          text: this.text
+          }, 0);
+          this.generalfilter({
+            offset: this.offsetAlbum,
+            limit: this.limit,
+            mode: 2,
+            text: this.text
+          }, 1);
+        }
       }
       else{
-        this.offsetAlbum = 0;
-        this.usersAlbum = [];
+        if(this.text){
+          this.generalfilter({
+            offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
+            limit: this.limit,
+            mode: 2,
+            text: this.text
+          }, this.tabIndex);
+        }
       }
-      this.pricefilter();
+      
     },
 
 
-    searchfilter(){
-      if(this.text){
-        this.generalfilter({
-        offset: this.tabIndex == 0 ? this.offsetNft : this.offsetAlbum,
-        limit: this.limit,
-        mode: 2,
-        text: this.text
-      })
-      }
-    },
-
-    applysearchfilter(){
-      this.tabIndex == 0 ? this.offsetNft = 0 : this.offsetAlbum = 0;
-      this.text = this.condition;
-      this.searchfilter();
-    },
     
     filterOthers(checked) {
       this.user = this.$store.getters.getAddress;
