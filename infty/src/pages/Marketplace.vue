@@ -45,7 +45,7 @@
                     class="price-range"
                     type="number"
                   ></b-form-input>
-                  <b-button id="price-apply-btn" variant="outline-primary" @click="pricefilter('button')"
+                  <b-button id="price-apply-btn" variant="outline-primary" @click="pricefilter('button', extracondition)"
                     >Apply</b-button
                   >
                 </b-card>
@@ -111,9 +111,9 @@
         <div id="search-bar">
           <b-input-group size="md" class="mb-2">
             
-            <b-form-input type="search" placeholder="Search..."  v-model="text" @key.enter='searchfilter("button")'></b-form-input>
+            <b-form-input type="search" placeholder="Search..."  v-model="text" @keyup.enter='searchfilter("button", extracondition)'></b-form-input>
             <b-input-group-prepend is-text>
-              <b-icon icon="search" style='cursor:pointer' @click='searchfilter("button")'></b-icon>
+              <b-icon icon="search" style='cursor:pointer' @click='searchfilter("button", extracondition)'></b-icon>
             </b-input-group-prepend>
           </b-input-group>
 
