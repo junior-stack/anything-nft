@@ -224,7 +224,7 @@ export default {
       priceTypeSelected: "usd",
       priceTypeOptions: [
         { value: "usd", text: "United States Dollar(USD)" },
-        { value: "cfx", text: "Ether(ETH)" },
+        { value: "cfx", text: "CFX" },
       ],
       usersCards: [],
       loadingNft: false,
