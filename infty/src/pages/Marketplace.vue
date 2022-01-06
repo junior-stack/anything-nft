@@ -34,14 +34,14 @@
                   ></b-form-select>
                   <b-form-input
                     v-model="min"
-                    placeholder="Min"
+                    :placeholder="min ? min : 'Min'"
                     class="price-range"
                     type="number"
                   ></b-form-input>
                   <span>to</span>
                   <b-form-input
                     v-model="max"
-                    placeholder="Max"
+                    :placeholder="max ? max : 'Max'"
                     class="price-range"
                     type="number"
                   ></b-form-input>
@@ -236,8 +236,8 @@ export default {
       user: null,
       notMine: false,
       loadingVar: 0,
-      min: 0,
-      max: 0,
+      min: null,
+      max: null,
       text: "",
       filtermode: 0,
       filtermethods: [],
@@ -404,6 +404,9 @@ export default {
     // extracondition to specify overlapping condition, such as nft with user = ...
 
     pricefilter(triggermethod, extracondition){
+      if(!this.min || !this.max){
+        return;
+      }
       if(triggermethod == "button"){
         this.offsetNft = 0;
         this.offsetAlbum = 0;
