@@ -22,6 +22,8 @@ const getMarket = async (req, res) => {
   const limit = body.limit || 10;
   const offset = body.offset || 0;
   const mode = body.mode;
+
+  //filter mode
   let filter = { status: constants.STATUS_SALE }
   if(mode == 1){
       filter = {status: constants.STATUS_SALE, currency: body.priceTypeSelected, price: {$gte: body.min, $lte: body.max}}
@@ -29,8 +31,13 @@ const getMarket = async (req, res) => {
   else if(mode == 2){
       filter = {status: constants.STATUS_SALE, title: {$regex: eval(`/${body.text}/`)}}
   }
-  console.log("filter",filter);
   if(body.tabIndex == 0){
+    // Overlapping filter condition
+    if(body.user != null){
+        filter["owner.0.address"] = {$ne: body.user}  //body.user;
+        let a = body.backupnftIds;
+        filter.nft_Id = {"$nin": a};
+    }
     const nftQuery = Nft.find(
         filter,
         { nft_id: 1 }
@@ -43,6 +50,13 @@ const getMarket = async (req, res) => {
       res.send(result);
   }
   else{
+    // Overlapping filter condition
+    if(body.user != null){
+        filter["owner.0.address"] = body.user;
+        let b =  body.backupalbumIds
+        filter.album_Id = {"$nin": b};
+    }
+
     const albumQuery = Album.find(
         filter,
         { album_id: 1 }
